@@ -95,7 +95,7 @@ class CWidget(QWidget):
             port = self.port.text()
             if self.c.connectServer(ip, int(port)):
                 self.btn.setText('접속 종료')
-            else:
+            else:   
                 self.c.stop()
                 self.sendmsg.clear()
                 self.recvmsg.clear()

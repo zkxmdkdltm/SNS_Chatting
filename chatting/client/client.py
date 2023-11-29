@@ -18,6 +18,7 @@ class ClientSocket:
         self.recv.recv_signal.connect(self.parent.updateMsg)
         self.disconn = Signal()
         self.disconn.disconn_signal.connect(self.parent.updateDisconnect)
+        self.client_id = None
 
         self.bConnect = False
 
@@ -31,13 +32,12 @@ class ClientSocket:
 
         try:
             self.client.connect((ip, port))
-        except Exception as e: #에러 처리
-            print('Connect Error : ', e)
+        except Exception as e:  # 에러 처리
+            print('Connect Error:', e)
             return False
-        else: # 접속 성공
+        else:  # 접속 성공
             self.bConnect = True
-            self.t = Thread(target=self.receive, args=(self.client,)) #쓰레드 생성
-            self.t.start()
+            self.start_receive_thread()  # 새로운 스레드에서 메시지 수신 시작
             print('Connected')
 
         return True
@@ -53,20 +53,31 @@ class ClientSocket:
 
     # 클라이언트 소켓 연결이 정상 -> 쓰레드 생성 -> 아래 함수 호출
     # 소켓의 데이터 수신을 대기함. (데이터를 수신하기 전까지 블록되어 다음 코드를 수행하지 않음.)
+    # Client의 client.py 파일에서 receive 메서드 수정
     def receive(self, client):
-        while self.bConnect: #무한 루프
+        while self.bConnect:  # 무한 루프
             try:
                 recv = client.recv(1024)
             except Exception as e:
-                print('Recv() Error :', e)
+                print('Recv() Error:', e)
                 break
-            else: #데이터 수신
+            else:  # 데이터 수신
+                if not recv:
+                    print('Server disconnected')
+                    self.stop()
+                    break
+
                 msg = str(recv, encoding='utf-8')
                 if msg:
                     self.recv.recv_signal.emit(msg)
                     print('[RECV]:', msg)
 
-        self.stop()
+        print('Receive thread exited') 
+
+    def start_receive_thread(self):
+        self.receive_thread = Thread(target=self.receive, args=(self.client,))
+        self.receive_thread.start()
+
 
     # 부모 윈도우의 [보내기] 버튼 누르면 호출됨.
     # 보낼 메세지 내용을 복사해 연결된 소켓으로 전송함.
@@ -75,6 +86,6 @@ class ClientSocket:
             return
 
         try:
-            self.client.send(msg.encode())
+            self.client.send(f'{msg}'.encode())
         except Exception as e:
-            print('Send() Error : ', e)
+            print('Send() Error:', e)

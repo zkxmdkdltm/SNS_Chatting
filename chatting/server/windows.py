@@ -111,23 +111,28 @@ class CWidget(QWidget):
             self.msg.clear()
             self.btn.setText('서버 실행')
 
+        # Server의 windows.py 파일에서 updateClient 메서드 수정
     def updateClient(self, addr, isConnect=False):
         row = self.guest.rowCount()
         if isConnect:
             self.guest.setRowCount(row + 1)
             self.guest.setItem(row, 0, QTableWidgetItem(addr[0]))
             self.guest.setItem(row, 1, QTableWidgetItem(str(addr[1])))
+            self.updateMsg(f'[{addr[1]}] 클라이언트가 접속했습니다. (ID: {self.s.client_ids[addr]})')
         else:
             for r in range(row):
-                ip = self.guest.item(r, 0).text()  # ip
-                port = self.guest.item(r, 1).text()  # port
+                ip = self.guest.item(r, 0).text()
+                port = self.guest.item(r, 1).text()
                 if addr[0] == ip and str(addr[1]) == port:
                     self.guest.removeRow(r)
+                    self.updateMsg(f'[{addr[1]}] 클라이언트가 연결을 종료했습니다. (ID: {self.s.client_ids[addr]})')
                     break
 
+    # updateMsg 메서드 수정
     def updateMsg(self, msg):
         self.msg.addItem(QListWidgetItem(msg))
         self.msg.setCurrentRow(self.msg.count() - 1)
+
 
     def sendMsg(self):
         if not self.s.bListen:

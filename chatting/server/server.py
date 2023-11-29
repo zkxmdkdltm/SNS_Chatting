@@ -14,7 +14,7 @@ class ServerSocket(QObject):
         self.clients = []
         self.ip = []
         self.threads = []
-
+        self.client_ids = {}  # 각 클라이언트의 고유 id를 저장할 딕셔너리
         self.update_signal.connect(self.parent.updateClient)
         self.recv_signal.connect(self.parent.updateMsg)
 
@@ -54,6 +54,7 @@ class ServerSocket(QObject):
             else:
                 self.clients.append(client)
                 self.ip.append(addr)
+                self.client_ids[addr] = len(self.clients)  # 새로운 클라이언트의 주소를 키로 추가
                 self.update_signal.emit(addr, True)
                 t = Thread(target=self.receive, args=(addr, client))
                 self.threads.append(t)
@@ -63,17 +64,18 @@ class ServerSocket(QObject):
         self.server.close()
 
     def receive(self, addr, client):
+        client_id = self.client_ids[addr]  # 클라이언트의 고유 id를 가져옴
         while True:
             try:
                 recv = client.recv(1024)
             except Exception as e:
-                print('Recv() Error :', e)
+                print('Recv() Error:', e)
                 break
             else:
                 msg = str(recv, encoding='utf-8')
                 if msg:
-                    self.send(msg)
-                    self.recv_signal.emit(msg)
+                    self.send(f'익명 [{client_id}] {msg}')  # 메세지 앞에 클라이언트 id를 붙여서 전송
+                    self.recv_signal.emit(f'[{client_id}] {msg}')
                     print('[RECV]:', addr, msg)
 
         self.removeClient(addr, client)
@@ -86,6 +88,8 @@ class ServerSocket(QObject):
             print('Send() Error : ', e)
 
     def removeClient(self, addr, client):
+        client_id = self.client_ids[addr]  # 클라이언트의 고유 id를 가져옴
+        
         # find closed client index
         idx = -1
         for k, v in enumerate(self.clients):
@@ -105,15 +109,15 @@ class ServerSocket(QObject):
         for c in self.clients:
             c.close()
 
-        for addr in self.ip:
+        for addr, client_id in self.client_ids.items():
             self.update_signal.emit(addr, False)
 
         self.ip.clear()
         self.clients.clear()
         self.threads.clear()
+        self.client_ids.clear()
 
         self.resourceInfo()
-
     def resourceInfo(self):
         print('Number of Client ip\t: ', len(self.ip))
         print('Number of Client socket\t: ', len(self.clients))
