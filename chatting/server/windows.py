@@ -18,28 +18,35 @@ class CWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('서버')
+        self.setWindowTitle('새로운 서버')
+
+        # 전체 배경 색상
+        self.setStyleSheet('background-color: white;')
 
         # 서버 설정 부분
         ipbox = QHBoxLayout()
 
         gb = QGroupBox('서버 설정')
+        gb.setStyleSheet('color: #333333; background-color: #D3D3D3; border: 1px solid #A9A9A9; border-radius: 5px; padding: 10px;')
         ipbox.addWidget(gb)
 
         box = QHBoxLayout()
 
         label = QLabel('Server IP')
+        label.setStyleSheet('color: #333333;')
         self.ip = QLineEdit(socket.gethostbyname(socket.gethostname()))
         box.addWidget(label)
         box.addWidget(self.ip)
 
         label = QLabel('Server Port')
+        label.setStyleSheet('color: #333333;')
         self.port = QLineEdit(str(port))
         box.addWidget(label)
         box.addWidget(self.port)
 
-        self.btn = QPushButton('서버 실행')
+        self.btn = QPushButton('Start Server')
         self.btn.setCheckable(True)
+        self.btn.setStyleSheet('color: #333333; background-color: #4CAF50; color: white; border: none; padding: 8px 16px; text-align: center; text-decoration: none; display: inline-block; font-size: 14px; margin: 4px 2px; cursor: pointer; border-radius: 5px;')
         self.btn.toggled.connect(self.toggleButton)
         box.addWidget(self.btn)
 
@@ -48,31 +55,36 @@ class CWidget(QWidget):
         # 접속자 정보 부분
         infobox = QHBoxLayout()
         gb = QGroupBox('접속자 정보')
+        gb.setStyleSheet('color: #333333; background-color: #D3D3D3; border: 1px solid #A9A9A9; border-radius: 5px; padding: 10px;')
         infobox.addWidget(gb)
 
         box = QHBoxLayout()
 
         self.guest = QTableWidget()
         self.guest.setColumnCount(2)
-        self.guest.setHorizontalHeaderItem(0, QTableWidgetItem('ip'))
-        self.guest.setHorizontalHeaderItem(1, QTableWidgetItem('port'))
+        self.guest.setHorizontalHeaderItem(0, QTableWidgetItem('IP'))
+        self.guest.setHorizontalHeaderItem(1, QTableWidgetItem('Port'))
 
         box.addWidget(self.guest)
         gb.setLayout(box)
 
         # 채팅창 부분
-        gb = QGroupBox('메시지')
+        gb = QGroupBox('새로운 메시지')
+        gb.setStyleSheet('color: #333333; background-color: #D3D3D3; border: 1px solid #A9A9A9; border-radius: 5px; padding: 10px;')
         infobox.addWidget(gb)
 
         box = QVBoxLayout()
 
-        label = QLabel('받은 메시지')
+        label = QLabel('Received Messages')
+        label.setStyleSheet('color: #333333; font-weight: bold;')
         box.addWidget(label)
 
         self.msg = QListWidget()
+        self.msg.setStyleSheet('background-color: white;')  # 채팅창 배경 색상
         box.addWidget(self.msg)
 
-        label = QLabel('보낼 메시지')
+        label = QLabel('Type Your Message')
+        label.setStyleSheet('color: #333333; font-weight: bold;')
         box.addWidget(label)
 
         self.sendmsg = QLineEdit()
@@ -80,11 +92,13 @@ class CWidget(QWidget):
 
         hbox = QHBoxLayout()
 
-        self.sendbtn = QPushButton('보내기')
+        self.sendbtn = QPushButton('Send Message')
+        self.sendbtn.setStyleSheet('color: #333333; background-color: #008CBA; color: white; border: none; padding: 8px 16px; text-align: center; text-decoration: none; display: inline-block; font-size: 14px; margin: 4px 2px; cursor: pointer; border-radius: 5px;')
         self.sendbtn.clicked.connect(self.sendMsg)
         hbox.addWidget(self.sendbtn)
 
-        self.clearbtn = QPushButton('채팅창 지움')
+        self.clearbtn = QPushButton('Clear Chat')
+        self.clearbtn.setStyleSheet('color: #333333; background-color: #D32F2F; color: white; border: none; padding: 8px 16px; text-align: center; text-decoration: none; display: inline-block; font-size: 14px; margin: 4px 2px; cursor: pointer; border-radius: 5px;')
         self.clearbtn.clicked.connect(self.clearMsg)
         hbox.addWidget(self.clearbtn)
 
@@ -99,6 +113,8 @@ class CWidget(QWidget):
         self.setLayout(vbox)
 
         self.show()
+
+
 
     def toggleButton(self, state):
         if state:

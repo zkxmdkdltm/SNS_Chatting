@@ -89,7 +89,7 @@ class ServerSocket(QObject):
 
     def removeClient(self, addr, client):
         client_id = self.client_ids[addr]  # 클라이언트의 고유 id를 가져옴
-        
+        print("removeClient")
         # find closed client index
         idx = -1
         for k, v in enumerate(self.clients):
@@ -106,6 +106,7 @@ class ServerSocket(QObject):
         self.resourceInfo()
 
     def removeAllClients(self):
+        print("removeAllClients")
         for c in self.clients:
             c.close()
 
